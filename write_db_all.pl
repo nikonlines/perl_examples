@@ -35,6 +35,9 @@ print end_html;
 if ($post_login != "" or $post_password != "") {
 
 use DBI;
+use DateTime;
+
+my $datetime=DateTime->now();
 
 #definition of variables
 my $db="db";
@@ -46,17 +49,31 @@ my $db_password="root";
 my $connection = DBI->connect ("DBI:mysql:database=$db:host=$db_host", $db_user, $db_password) 
   or die "Can't connect to database: $DBI::errstr\n";
 
+#----------------------------
+
 # set the value of your SQL query
-my $query = "insert into users (LOGIN, PASSWORD)
+my $query = "insert into hosts (REMOTE_ADDR, REMOTE_HOST, HTTP_X_FORWARDED_FOR, HTTP_COOKIE, REQUEST_METHOD, DATETIME)
+          values (?, ?, ?, ?, ?, ?)";
+
+# prepare your statement for connecting to the database
+my $statement = $connection->prepare($query);
+
+# execute your SQL statement
+$statement->execute($remote_ip, $remote_host, $proxy_ip, $cookie, $request_method, $datetime);
+
+#----------------------------
+
+# set the value of your SQL query
+my $query = "insert into users (LOGIN, PASSWORD, DATETIME)
           values (?, ?)";
 
 # prepare your statement for connecting to the database
 my $statement = $connection->prepare($query);
 
 # execute your SQL statement
-$statement->execute($post_login, $post_password);
+$statement->execute($post_login, $post_password, $datetime);
 
-#---------------------
+#----------------------------
 
 warn "Problem in retrieving results", $statement->errstr( ), "\n"
   if $statement->err( );
