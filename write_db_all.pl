@@ -65,7 +65,7 @@ $statement->execute($remote_ip, $remote_host, $proxy_ip, $cookie, $request_metho
 
 # set the value of your SQL query
 my $query = "insert into users (LOGIN, PASSWORD, DATETIME)
-          values (?, ?)";
+          values (?, ?, ?)";
 
 # prepare your statement for connecting to the database
 my $statement = $connection->prepare($query);
